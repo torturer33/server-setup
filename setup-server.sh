@@ -1,57 +1,39 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Ubuntu Server kurulumu sonrası otomasyon başlıyor..."
+echo "🚀 Ubuntu Server Setup Başlıyor..."
 
-# 1. Sistem güncelleme
-sudo apt update && sudo apt -y upgrade
+# Sistem güncelleme
+echo "🔹 Sistem güncelleniyor..."
+sudo apt update && sudo apt upgrade -y
 
-# 2. OpenSSH Server kurulumu
-echo "🔑 OpenSSH kuruluyor..."
-sudo apt install -y openssh-server
-sudo systemctl enable --now ssh
+# Docker kurulumu
+echo "🔹 Docker kuruluyor..."
+curl -fsSL https://get.docker.com | sh
 
-# 3. Docker kurulumu
-echo "🐳 Docker kuruluyor..."
-sudo apt-get install -y ca-certificates curl gnupg lsb-release
-sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+# Docker Compose Plugin kurulumu
+echo "🔹 Docker Compose kuruluyor..."
+sudo apt install -y docker-compose-plugin
+
+# Kullanıcıyı docker grubuna ekle
 sudo usermod -aG docker $USER
 
-# 4. Coolify kurulumu
-echo "🔥 Coolify kuruluyor..."
-curl -fsSL https://cdn.coollabs.io/coolify/install.sh | sudo bash
+# Coolify kurulumu
+echo "🔹 Coolify kuruluyor..."
+docker volume create coolify-data
+docker run -d --name coolify \
+  --restart unless-stopped \
+  -p 3000:3000 \
+  -v coolify-data:/app/data \
+  coollabsio/coolify:latest
 
-# 5. Cloudflared kurulumu
-echo "🌐 Cloudflared kuruluyor..."
-curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb -o cloudflared.deb
-sudo dpkg -i cloudflared.deb || true
+# Cloudflared kurulumu
+echo "🔹 Cloudflared kuruluyor..."
+wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+sudo dpkg -i cloudflared-linux-amd64.deb
+rm cloudflared-linux-amd64.deb
 
-echo ""
-echo "✅ Kurulum tamamlandı!"
-echo "👉 Şimdi manuel olarak şunu çalıştırmalısın:"
-echo "   cloudflared tunnel login"
-echo ""
-
-# 6. Kurulum sonrası testler
-echo "🔍 Kurulum sonrası testler yapılıyor..."
-
-echo "➡️ OpenSSH durumu:"
-systemctl is-active --quiet ssh && echo "✅ SSH aktif" || echo "❌ SSH çalışmıyor"
-
-echo "➡️ Docker versiyonu:"
-docker --version || echo "❌ Docker bulunamadı"
-
-echo "➡️ Docker Compose versiyonu:"
-docker compose version || echo "❌ Docker Compose bulunamadı"
-
-echo "➡️ Cloudflared versiyonu:"
-cloudflared --version || echo "❌ Cloudflared bulunamadı"
-
-echo ""
-echo "🎉 Tüm kurulum ve testler tamamlandı!"
+# Kurulum Testleri
+echo "🔹 Kurulum testleri:"
+docker --version
+docker
