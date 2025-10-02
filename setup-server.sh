@@ -33,6 +33,25 @@ curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cl
 sudo dpkg -i cloudflared.deb || true
 
 echo ""
-echo "✅ İşlem tamamlandı!"
+echo "✅ Kurulum tamamlandı!"
 echo "👉 Şimdi manuel olarak şunu çalıştırmalısın:"
 echo "   cloudflared tunnel login"
+echo ""
+
+# 6. Kurulum sonrası testler
+echo "🔍 Kurulum sonrası testler yapılıyor..."
+
+echo "➡️ OpenSSH durumu:"
+systemctl is-active --quiet ssh && echo "✅ SSH aktif" || echo "❌ SSH çalışmıyor"
+
+echo "➡️ Docker versiyonu:"
+docker --version || echo "❌ Docker bulunamadı"
+
+echo "➡️ Docker Compose versiyonu:"
+docker compose version || echo "❌ Docker Compose bulunamadı"
+
+echo "➡️ Cloudflared versiyonu:"
+cloudflared --version || echo "❌ Cloudflared bulunamadı"
+
+echo ""
+echo "🎉 Tüm kurulum ve testler tamamlandı!"
