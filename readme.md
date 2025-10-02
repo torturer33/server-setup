@@ -13,8 +13,8 @@ Tek satırla indirip çalıştırabilirsiniz.
 ## 🔹 Kullanım
 
 Sunucunuza giriş yaptıktan sonra aşağıdaki komutu çalıştırın:
+Not: cloudflared tunnel login adımını script sonunda manuel çalıştırmanız gerekir. Çünkü bu işlem tarayıcı açarak Cloudflare hesabına giriş yapmanızı ister.
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/torturer33/server-setup/main/setup-server.sh)
 
-Not: cloudflared tunnel login adımını script sonunda manuel çalıştırmanız gerekir. Çünkü bu işlem tarayıcı açarak Cloudflare hesabına giriş yapmanızı ister.
